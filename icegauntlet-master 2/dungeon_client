@@ -10,6 +10,9 @@ import sys
 import atexit
 import logging
 import argparse
+import Ice
+Ice.loadSlice('icegauntlet.ice')
+import Icegauntlet 
 
 import game
 import game.common
@@ -56,8 +59,10 @@ def main():
         return BAD_COMMAND_LINE
 
     game.pyxeltools.initialize()
-    dungeon = game.DungeonMap(user_options.LEVEL)
+
+    dungeon = game.RemoteDungeonMap(user_options.LEVEL)
     gauntlet = game.Game(user_options.hero, dungeon)
+
     gauntlet.add_state(game.screens.TileScreen, game.common.INITIAL_SCREEN)
     gauntlet.add_state(game.screens.StatsScreen, game.common.STATUS_SCREEN)
     gauntlet.add_state(game.screens.GameScreen, game.common.GAME_SCREEN)
