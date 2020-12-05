@@ -13,8 +13,6 @@ import signal
 
 import psutil
 
-
-import hashlib
 import sys
 import Ice
 
@@ -44,7 +42,7 @@ class Client(Ice.Application):
             if opcion == 1:
                 ''' 1.3.2 change password'''
 
-                hashlid.sha256(password)
+                
                 
                 user = input("user")
                 password = getpass.getpass("password1")
