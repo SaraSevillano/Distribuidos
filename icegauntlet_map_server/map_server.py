@@ -15,7 +15,8 @@ import signal
 import string
 import logging
 import os.path
-
+import os
+import random
 
 import Ice
 Ice.loadSlice('icegauntlet.ice')
@@ -23,15 +24,17 @@ Ice.loadSlice('icegauntlet.ice')
 # pylint: disable=C0413
 import IceGauntlet
 
-ROOMS_FILE = 'rooms.json'
-CURRENT_TOKEN = 'current_token'
+DIRECTORY_MAPS = 'mapas'
+ROOMS_PATH = 'mapas/rooms.json'
 
+def id_generator(size=6, chars= string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 class RoomManagerI(IceGauntlet.RoomManager):
     '''room manager servant'''
     def __init__(self):
         self._rooms_ = {}
-        if os.path.exists(ROOMS_FILE):
+        if os.path.exists(ROOMS_PATH):
             self.refresh()
         else:
             self.__commit__()
@@ -39,31 +42,66 @@ class RoomManagerI(IceGauntlet.RoomManager):
     def refresh(self, *args, **kwargs):
         '''Reload user DB to RAM'''
         logging.debug('Reloading rooms database')
-        with open(ROOMS_FILE, 'r') as contents:
+        with open(ROOMS_PATH, 'r') as contents:
             self._rooms_ = json.load(contents)
 
     def __commit__(self):
         logging.debug('Rooms database updated!')
-        with open(ROOMS_FILE, 'w') as contents:
+        if not os.path.isdir(DIRECTORY_MAPS):
+            os.mkdir(DIRECTORY_MAPS)
+        with open(ROOMS_PATH, 'w') as contents:
             json.dump(self._rooms_, contents, indent=4, sort_keys=True)
 
     def publish(self, token, roomData, current=None):
         '''Publish new map'''
         with open(roomData, 'r') as contents:
             newRoom = json.load(contents)
-        t = {"token": token}
-        newRoom.update(t)
-        if roomData in self._rooms_ and self._rooms_[roomData]["token"] != token:
-            '''lanzar exception RoomAlreadyExists y borrar print'''
-            print("room already exists y es de otro usuario")
-            return 1
-        '''Añadir el resto de condiciones con las excepciones correspondientes'''
-        self._rooms_[roomData] = newRoom
+
+        roomName = newRoom["room"]
+        mapFile = ''
+
+        '''RoomAlreadyExists'''
+        if roomName in self._rooms_:
+            '''Ese mapa pertence a otro usuario'''
+            if self._rooms_[roomName]["token"] != token:
+                raise IceGauntlet.RoomAlreadyExists()
+                return 1
+            '''Actualiza el contenido del mapa existente'''
+            mapFile = self._rooms_[roomName]["file"]
+            with open(DIRECTORY_MAPS + '/' + mapFile, 'w') as contents:
+                json.dump(newRoom, contents, indent=4, sort_keys=True)
+            return 0
+        
+        '''Actualizar rooms.json con el nuevo mapa, el token  y el json asociado'''
+        mapFile = id_generator() + '.json'
+        self._rooms_[roomName] = {"token": token, "file": mapFile}
         self.__commit__()
 
-    '''def remove(self, token, roomData, current=None):'''
-    
+        '''Añadir nuevo json del mapa a la carpeta mapas del servidor'''
+        with open(DIRECTORY_MAPS + '/' + mapFile, 'w') as contents:
+            json.dump(newRoom, contents, indent=4, sort_keys=True)
 
+    def remove(self, token, roomName, current=None):
+        '''Remove mapa'''
+        '''RoomAlreadyExists'''
+        if roomName in self._rooms_:
+            '''Ese mapa pertence a otro usuario'''
+            if self._rooms_[roomName]["token"] != token:
+                raise IceGauntlet.Unauthorized()
+                return 1
+            '''Borrar mapa'''
+            mapFile = self._rooms_[roomName]["file"]
+            self._rooms_.pop(roomName)
+            with open(ROOMS_PATH, 'w') as contents:
+                json.dump(self._rooms_, contents, indent=4, sort_keys=True)
+            if os.path.exists(DIRECTORY_MAPS + '/' + mapFile):
+                os.remove(DIRECTORY_MAPS + '/' + mapFile)
+            return 0
+        
+        '''EL room no existe'''
+        raise IceGauntlet.RoomNotExists()
+        return 1
+        
 
 class Server(Ice.Application):
     '''

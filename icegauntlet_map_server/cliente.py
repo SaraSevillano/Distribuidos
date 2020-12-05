@@ -25,34 +25,45 @@ class Client(Ice.Application):
     
     def run(self, argvs):
         try:
-            proxy = argvs[1]
+            proxyMapas = argvs[1]
+            proxyAuth = argvs[2]
         except IndexError:
-            print("falta el proxy")
+            print("falta alguno de los proxy")
             return 1
 
-        proxy = self.communicator().stringToProxy(proxy)  
+        proxyMapas = self.communicator().stringToProxy(proxyMapas)  
+        proxyAuth = self.communicator().stringToProxy(proxyAuth)  
         ''' room -> objeto remoto servidor RoomManager'''
-        room = IceGauntlet.RoomManagerPrx.checkedCast(proxy)
+        room = IceGauntlet.RoomManagerPrx.checkedCast(proxyMapas)
+
+        ''' auth -> objeto remoto servidor Authentication'''
+        auth = IceGauntlet.AuthenticationPrx.checkedCast(proxyAuth)
+
+        opcion = int(input("opcion"))
 
         try:
-            '''upload new map'''
-            mapName = input("map")
-            token = input("token")                    
-            room.publish(token, mapName)
-            return 0
+            if opcion == 1:
+                ''' upload new map'''
+                mapName = input("map")
+                token = input("token")    
+                '''Comprobar con el server de autenticacion si el token es valido'''
+                if not auth.isValid(token):
+                    raise IceGauntlet.Unauthorized()
+                    return 1
+                room.publish(token, mapName)
+                return 0
+            elif opcion == 2:
+                ''' delete map'''
+                roomName = input("roomName")
+                token = input("token")    
+                '''Comprobar con el server de autenticacion si el token es valido'''
+                if not auth.isValid(token):
+                    raise IceGauntlet.Unauthorized()
+                    return 1
+                room.remove(token, roomName)
+                return 0
         except OSError:
             print('ERROR: JSON file with user data not found!')
-
-        try:
-            ''' remove new map'''
-            mapName = input("map")
-            token = input("token")                    
-            room.remove(token, mapName)
-            return 0
-        except OSError:
-            print('ERROR: JSON file with user data not found!')
-
-
 
 
 if __name__ == "__main__":
