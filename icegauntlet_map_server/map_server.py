@@ -32,7 +32,8 @@ def id_generator(size=6, chars= string.ascii_uppercase + string.digits):
 
 class RoomManagerI(IceGauntlet.RoomManager):
     '''room manager servant'''
-    def __init__(self):
+    def __init__(self, auth):
+        self._auth_ = auth
         self._rooms_ = {}
         if os.path.exists(ROOMS_PATH):
             self.refresh()
@@ -53,6 +54,11 @@ class RoomManagerI(IceGauntlet.RoomManager):
             json.dump(self._rooms_, contents, indent=4, sort_keys=True)
 
     def publish(self, token, roomData, current=None):
+        '''Comprobar con el server de autenticacion si el token es valido'''
+        if not self._auth_.isValid(token):
+            raise IceGauntlet.Unauthorized()
+            return 1
+        
         '''Publish new map'''
         with open(roomData, 'r') as contents:
             newRoom = json.load(contents)
@@ -82,6 +88,10 @@ class RoomManagerI(IceGauntlet.RoomManager):
             json.dump(newRoom, contents, indent=4, sort_keys=True)
 
     def remove(self, token, roomName, current=None):
+        '''Comprobar con el server de autenticacion si el token es valido'''
+        if not self._auth_.isValid(token):
+            raise IceGauntlet.Unauthorized()
+            return 1
         '''Remove mapa'''
         '''RoomAlreadyExists'''
         if roomName in self._rooms_:
@@ -108,11 +118,17 @@ class Server(Ice.Application):
     Maps Server
     '''
     def run(self, args):
+        proxyAuth = args[1]
+        
+        proxyAuth = self.communicator().stringToProxy(proxyAuth)  
+        ''' auth -> objeto remoto servidor Authentication'''
+        auth = IceGauntlet.AuthenticationPrx.checkedCast(proxyAuth)
+
         '''
         Server loop
         '''
         logging.debug('Initializing server...')
-        servant = RoomManagerI()
+        servant = RoomManagerI(auth)
         signal.signal(signal.SIGUSR1, servant.refresh)
 
         adapter = self.communicator().createObjectAdapter('RoomManagerAdapter')

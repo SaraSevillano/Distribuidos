@@ -26,18 +26,13 @@ class Client(Ice.Application):
     def run(self, argvs):
         try:
             proxyMapas = argvs[1]
-            proxyAuth = argvs[2]
         except IndexError:
-            print("falta alguno de los proxy")
+            print("falta el proxy")
             return 1
-
+        
         proxyMapas = self.communicator().stringToProxy(proxyMapas)  
-        proxyAuth = self.communicator().stringToProxy(proxyAuth)  
         ''' room -> objeto remoto servidor RoomManager'''
         room = IceGauntlet.RoomManagerPrx.checkedCast(proxyMapas)
-
-        ''' auth -> objeto remoto servidor Authentication'''
-        auth = IceGauntlet.AuthenticationPrx.checkedCast(proxyAuth)
 
         opcion = int(input("opcion"))
 
@@ -46,20 +41,14 @@ class Client(Ice.Application):
                 ''' upload new map'''
                 mapName = input("map")
                 token = input("token")    
-                '''Comprobar con el server de autenticacion si el token es valido'''
-                if not auth.isValid(token):
-                    raise IceGauntlet.Unauthorized()
-                    return 1
+                
                 room.publish(token, mapName)
                 return 0
             elif opcion == 2:
                 ''' delete map'''
                 roomName = input("roomName")
                 token = input("token")    
-                '''Comprobar con el server de autenticacion si el token es valido'''
-                if not auth.isValid(token):
-                    raise IceGauntlet.Unauthorized()
-                    return 1
+                
                 room.remove(token, roomName)
                 return 0
         except OSError:
