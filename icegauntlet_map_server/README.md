@@ -8,7 +8,6 @@ Just run with:
 ```bash
 ./upload_map <proxy> <token> <archivoMapa>
 
-```bash
 ./delete_map.py <proxy> <token> <archivoMapa>
 
 
