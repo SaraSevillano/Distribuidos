@@ -6,10 +6,10 @@ Just run with:
 ```
 
 ```bash
-./upload_map <proxy> <token_cliente_auth> <nombre_archivo.json>
+./upload_map <proxy> <token> <archivoMapa>
 
 ```bash
-./delete_map.py 
+./delete_map.py <proxy> <token> <archivoMapa>
 
 
 
