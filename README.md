@@ -5,4 +5,4 @@
 - Africa Simón Sesmero <Africa.Simon@alu.uclm.es>
 
 Enlace al repositorio:
-https://github.com/SaraSevillano/Distribuidos
+https://github.com/SaraSevillano/SSDD-SimonSevillanoSerrano
