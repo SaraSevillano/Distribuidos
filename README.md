@@ -1,51 +1,29 @@
-# ICE Gauntlet
+## Ejecución 
 
-ICE Gauntlet es un juego en red educativo que pretende introducir en el diseño de sistemas distribuídos.
+1. Carpeta: icegauntlet_auth_server
 
-El juego está basado en el clásico de Atari Games: GAUNTLET, pero mucho más simple ya que el objetivo del programa es meramente educativo, animamos a colaborar con el proyecto para añadir más features a quien así lo desee.
+./auth_server --Ice.Config=auth_server.conf
 
-## Python y ZeroC ICE
+./add_user <user_name>
 
-El lenguaje utilizado para su desarrollo ha sido **Python 3** con las siguientes librerías externas:
-* Pyxel
-* Pillow
+2. Directorio raiz
 
-y opcionalmente:
-* xmltodict
+Obtener un nuevo token:
 
-Como motor de red (middleware de comunicaciones) se ha utilizado ZeroC ICE 3.7.4 aunque debería funcionar con cualquier versión, al menos desde **ICE 3.5**.
+  ./get_new_token < user > < password > < proxy >
+  
+Cambiar de contraseña:
 
-## Instalación
+  ./auth_client.py < proxy autenticacion >
 
-Se recomienda la instalación del proyecto en un *virtual environment* dedicado. Se puede utilizar el fichero *requetiments.txt* para construír dicho entorno:
-```sh
-mkvirtualenv icegauntlet -p /usr/bin/python3
-pip install -r requeriments.txt
-```
-Finalmente la instalación se puede realizar como cualquier otro proyecto estándar de Python:
-```sh
-python3 setup.py install
-```
+Ejecutar el servidor de mapas:
 
-## Ejecución en local
+./run_map_server.py < proxy servidor autenticacion >
 
-Para probar mapas o el propio motor del juego, se puede ejecutar en local sin necesidad de conectar a un servidor, símplemente ejecutamos *dungeon_local* y el mapa que queramos cargar:
-```sh
-dungeon_local tutorial.json
-```
+Subir un mapa:
 
-Los mapas se buscan en las carpetas de *assets* del juego, es decir, cualquiera de las siguientes:
-* $PWD/assets
-* $HOME/.icegauntlet/assets
-* /usr/local/share/icegauntlet/assets
-* /usr/share/icegauntlet/assets
+./upload_map.py < proxy servidor mapas > < token > < archivoMapa >
 
-Además podemos indicar varios mapas que se jugarán en el mismo orden en el que se especifican:
-```sh
-dungeon_local tutorial.json level01.json level02.json
-```
+Eliminar un mapa:
 
-Por defecto el personaje seleccionado es el guerrero (*warrior*) pero puede elegirse cualquiera de los cuatro tipos disponibles: guerrero(*warrior*), valkiria (*valkyrie*), mago (*wizard*) y elfo(*elf*). Para ello usaremos la opción *--player* o símplemente *-p*:
-```sh
-dungeon_local -p elf tutorial.json
-```
+./delete_map.py < proxy servidor mapas > < token > < nombre mapa >
