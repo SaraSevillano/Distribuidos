@@ -10,11 +10,19 @@
 
 Obtener un nuevo token:
 
-  ./get_new_token < user > < password > < proxy >
+  ./get_new_token < user > < password > < proxy autenticacion >
   
 Cambiar de contraseña:
 
   ./auth_client.py < proxy autenticacion >
+  
+    - Insertar:
+  
+      - user
+  
+      - password
+  
+      - new_password
 
 Ejecutar el servidor de mapas:
 
@@ -22,7 +30,7 @@ Ejecutar el servidor de mapas:
 
 Subir un mapa:
 
-./upload_map.py < proxy servidor mapas > < token > < archivoMapa >
+./upload_map.py < proxy servidor mapas > < token > < archivoMapa.json >
 
 Eliminar un mapa:
 
