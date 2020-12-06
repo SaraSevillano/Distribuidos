@@ -11,8 +11,9 @@ import atexit
 import logging
 import argparse
 import Ice
-Ice.loadSlice('icegauntlet.ice')
 import Icegauntlet 
+Ice.loadSlice('icegauntlet.ice')
+
 
 import game
 import game.common
