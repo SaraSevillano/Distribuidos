@@ -27,7 +27,7 @@ def auth_server_pid():
             for arg in proc.cmdline():
                 if arg.startswith('./'):
                     arg = arg[2:]
-                if arg == 'auth_server.py':
+                if arg == 'auth_server':
                     return proc.pid
     return None
 
