@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-Script to run authentication user
+Script to run upload map
 '''
 
 import os
@@ -14,21 +14,20 @@ except ImportError:
     sys.exit(1)
 
 # Define command to request new token
-_COMMAND_ = './cliente.py "%(proxyMapas)s" "%(proxyAuth)s"'
+_COMMAND_ = './cliente.py "%(proxyMapas)s"'
 
 # Get required arguments
 try:
-    proxyMapas, token, archivoMapa, proxyAuth = sys.argv[1:]
+    proxyMapas, token, archivoMapa = sys.argv[1:]
 except ValueError:
-    print('Command arguments: {} <proxy servidor mapas> <token> <archivoMapa> <proxy servidor autenticacion> '.format(
+    print('Command arguments: {} <proxy servidor mapas> <token> <archivoMapa> '.format(
         os.path.basename(sys.argv[0]))
     )
     sys.exit(1)
 
 # Compose command
 final_command = _COMMAND_ % {
-    'proxyMapas': proxyMapas,
-    'proxyAuth': proxyAuth
+    'proxyMapas': proxyMapas
 }
 
 # Run command
