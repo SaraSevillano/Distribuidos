@@ -30,7 +30,7 @@ class Client(Ice.Application):
         try:
             proxy = argvs[1]
         except IndexError:
-            print("falta el proxy")
+            print('Command arguments: {} <proxy autenticacion>')
             return 1
 
         proxy = self.communicator().stringToProxy(proxy)  

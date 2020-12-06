@@ -19,7 +19,7 @@ import os
 import random
 
 import Ice
-Ice.loadSlice('icegauntlet.ice')
+Ice.loadSlice('IceGauntlet.ice')
 # pylint: disable=E0401
 # pylint: disable=C0413
 import IceGauntlet

@@ -1,14 +1,18 @@
 {
+    "Manuel": {
+        "current_token": "FEvW3EDxLwmbADnMwCijh0TzCJV4Rivj9pvr9L7T",
+        "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"
+    },
     "africa": {
         "current_token": "PFHlL4kZtssD6EMPEmyGsRXgMJFn1dpWExZ7quuU",
         "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"
     },
-    "eva": {
-        "current_token": "oB23nHj58PuXCPIoYwqjxQKvTH2wCZ7pnfwjsQmV",
-        "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"
+    "dolores": {
+        "current_token": "sr5T6dd9FvXPXwfsFqqU5UhvzNNVUX3NIDIpydIQ",
+        "password_hash": "fe2592b42a727e977f055947385b709cc82b16b9a87f88c6abf3900d65d0cdc3"
     },
-    "sara": {
-        "current_token": "ohN8Fk3Q2jhCqW5zmgqqlFCM95T7YdHFr95rWUsa",
+    "vicente": {
+        "current_token": "leU5NMcBVTSiI7fEUUSrLvGwH9y7RKT6024oDRgJ",
         "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"
     }
 }

@@ -16,7 +16,7 @@ import psutil
 import sys
 import Ice
 
-Ice.loadSlice('icegauntlet.ice')
+Ice.loadSlice('IceGauntlet.ice')
 
 import IceGauntlet
 import getpass
