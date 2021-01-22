@@ -26,7 +26,6 @@ import IceGauntlet
 
 from roomGestion import RoomGestionI
 
-<<<<<<< HEAD
 from manage_topics import *
 
 class RoomManagerI(IceGauntlet.RoomManager):
@@ -34,21 +33,10 @@ class RoomManagerI(IceGauntlet.RoomManager):
 
     roomManager = None
 
-=======
-class RoomManagerI(IceGauntlet.RoomManager):
-    '''room manager servant'''
->>>>>>> ae8d3d7da3b8188cbe424af783bb5e96bc0aa03f
     def __init__(self, auth, roomGestion):
         self._roomGestion = roomGestion
         self._auth_ = auth
 
-<<<<<<< HEAD
-=======
-    def refresh(self, *args, **kwargs):
-        '''Reload user DB to RAM'''
-        self._roomGestion.refresh()
-
->>>>>>> ae8d3d7da3b8188cbe424af783bb5e96bc0aa03f
     def publish(self, token, roomData, current=None):
         '''Comprobar con el server de autenticacion si el token es valido'''      
         owner = self._auth_.getOwner(token)
@@ -59,7 +47,6 @@ class RoomManagerI(IceGauntlet.RoomManager):
         owner = self._auth_.getOwner(token)
         self._roomGestion.remove(owner, roomName)
 
-<<<<<<< HEAD
     def availableRooms(self, current=None):
         '''Devuelve el nombre de todos los mapas disponibles'''
 
@@ -103,10 +90,9 @@ class InitRoomManagers():
         logging.debug('Initializing server...')
         self.roomManager = RoomManagerI(auth, roomGestion)
         self.roomManager.roomManager = self
-
+        
         self.adapter = broker.createObjectAdapter("RoomManagerAdapter")
-        ident = broker.getProperties().getProperty("Identity")
-        self.proxy = self.adapter.add(self.roomManager, broker.stringToIdentity(ident))
+        self.proxy = self.adapter.addWithUUID(self.roomManager)
         self.proxy_room_manager = self.adapter.createDirectProxy(self.proxy.ice_getIdentity())
         print('"{}"'.format(self.proxy), flush=True)
 
@@ -115,17 +101,16 @@ class InitRoomManagers():
 
         ''' Activar adapter y llamar hello event '''
         self.adapter.activate()
-        self.publisher.hello(IceGauntlet.RoomManagerPrx.checkedCast(self.proxy_room_manager), self.roomManager.ice_toString())
+        self.publisher.hello(IceGauntlet.RoomManagerSyncPrx.checkedCast(self.proxy_room_manager), "Hola" '''self.roomManager.ice_toString(managerId)''')
 
     def crear_roomManagerSync_channel(self):
         ''' Crear room manager sync channel'''
         self.subscriptor = RoomManagerSyncI()
         self.subscriptor.roomManager = self
         self.proxy_event = self.adapter.addWithUUID(self.subscriptor)
-        ident = self.proxy_event.ice_getIdentity()
-        self.proxy_subscriptor = self.adapter.createDirectProxy(ident)
+        self.proxy_subscriptor = self.adapter.createDirectProxy(self.proxy_event.ice_getIdentity())
         self.topic_room_manager.subscribeAndGetPublisher({}, self.proxy_subscriptor)
-        self.publisher = IceGauntlet.RoomManagerPrx.uncheckedCast(self.topic_room_manager.getPublisher())
+        self.publisher = IceGauntlet.RoomManagerSyncPrx.uncheckedCast(self.topic_room_manager.getPublisher())
 
     def hello(self, roomManager, managerId):
         ''' Hello a un room manager'''
@@ -148,44 +133,20 @@ class InitRoomManagers():
     def eliminar_room(self, roomName, current=None):
         '''Eliminar room'''
     
-=======
->>>>>>> ae8d3d7da3b8188cbe424af783bb5e96bc0aa03f
 class Server(Ice.Application):
     '''
     Maps Server
     '''
     def run(self, args):
         proxyAuth = args[1]
-<<<<<<< HEAD
-=======
-        
->>>>>>> ae8d3d7da3b8188cbe424af783bb5e96bc0aa03f
         proxyAuth = self.communicator().stringToProxy(proxyAuth)  
         ''' auth -> objeto remoto servidor Authentication'''
         auth = IceGauntlet.AuthenticationPrx.checkedCast(proxyAuth)
 
-<<<<<<< HEAD
         broker = self.communicator()
         manage = ManageTopics(broker, "RoomManagerSyncChannel")
         topic_room_manager = manage.topic_room_manager
         roomManager = InitRoomManagers(broker, auth, topic_room_manager)
-=======
-        roomGestion = RoomGestionI()
-
-        '''
-        Server loop
-        '''
-        logging.debug('Initializing server...')
-        servant = RoomManagerI(auth, roomGestion)
-        signal.signal(signal.SIGUSR1, servant.refresh)
-
-        adapter = self.communicator().createObjectAdapter('RoomManagerAdapter')
-        proxy = adapter.add(servant, self.communicator().stringToIdentity('default'))
-        adapter.addDefaultServant(servant, '')
-        adapter.activate()
-        logging.debug('Adapter ready, servant proxy: {}'.format(proxy))
-        print('"{}"'.format(proxy), flush=True)
->>>>>>> ae8d3d7da3b8188cbe424af783bb5e96bc0aa03f
 
         logging.debug('Entering server loop...')
         self.shutdownOnInterrupt()

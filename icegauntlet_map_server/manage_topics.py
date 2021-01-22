@@ -15,7 +15,7 @@ class ManageTopics:
     def create_topic_manager(self):
         ''' Create topic manager '''
         key = 'IceStorm.TopicManager.Proxy'
-        proxy = self.broker.stringToProxy(key)
+        proxy = self.broker.propertyToProxy(key)
         
         if proxy is None:
             return None
