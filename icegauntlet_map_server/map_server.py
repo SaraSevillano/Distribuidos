@@ -28,6 +28,9 @@ from roomGestion import RoomGestionI
 
 from manage_topics import *
 
+def id_generator(size=6, chars= string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 class RoomManagerI(IceGauntlet.RoomManager):
     '''room manager servant'''
 
@@ -51,7 +54,8 @@ class RoomManagerI(IceGauntlet.RoomManager):
         '''Devuelve el nombre de todos los mapas disponibles'''
 
     def getRoom(self, roomName, current=None):
-        '''Devuelve el room solicitado'''
+        owner = self._auth_.getOwner(token)
+        self._roomGestion.getRoom(roomName)
 
 
 class RoomManagerSyncI(IceGauntlet.RoomManagerSync):
@@ -101,7 +105,8 @@ class InitRoomManagers():
 
         ''' Activar adapter y llamar hello event '''
         self.adapter.activate()
-        self.publisher.hello(IceGauntlet.RoomManagerSyncPrx.checkedCast(self.proxy_room_manager), "Hola" '''self.roomManager.ice_toString(managerId)''')
+        self.id = id_generator()
+        self.publisher.hello(IceGauntlet.RoomManagerPrx.checkedCast(self.proxy_room_manager), self.id)
 
     def crear_roomManagerSync_channel(self):
         ''' Crear room manager sync channel'''
@@ -114,18 +119,20 @@ class InitRoomManagers():
 
     def hello(self, roomManager, managerId):
         ''' Hello a un room manager'''
-        if roomManager.ice_toString() in self.roomManagers_dict:
-            return
-        print("Hi! soy %s" % roomManager.ice_toString())
-        self.roomManagers_dict[roomManager.ice_toString()] = roomManager
-        roomManager.announce(IceGauntlet.RoomManagerPrx.checkedCast(self.proxy_room_manager), roomManager.ice_toString())
-
+        if managerId in self.roomManagers_dict:
+            return 
+        print("Holaaa! soy %s" % managerId)
+        self.roomManagers_dict[managerId] = roomManager
+        self.announce(IceGauntlet.RoomManagerSyncPrx.checkedCast(self.proxy_room_manager), self.id)
+   
     def announce(self, roomManager, managerId):
         ''' Announce room manager '''
-        if roomManager.ice_toString() in self.roomManagers_dict:
-            return
-        print("Hi! yo soy %s" % roomManager.ice_toString())
-        self.roomManagers_dict[roomManager.ice_toString()] = roomManager
+        if managerId not in self.roomManagers_dict:
+            return 
+        print("Respuesta! yo soy %s" % managerId)
+        self.roomManagers_dict[managerId] = roomManager
+        self.publisher.hello(IceGauntlet.RoomManagerSyncPrx.checkedCast(self.proxy_room_manager), self.id)
+    
 
     def añadir_room(self, roomName, managerId, current=None):
         '''Añadir room'''

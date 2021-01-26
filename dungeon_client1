@@ -39,7 +39,7 @@ class RemoteDungeonMap:
     
 
     def __init__(self,proxy):
-        self.dungeon = IceGauntlet.DungeonPrx.checkedCast(proxy)
+        self.dungeon = IceGauntlet.RoomManagerPrx.checkedCast(proxy)
         if not self.dungeon:
             raise RuntimeError('Invalid proxy')
 
@@ -61,13 +61,7 @@ def parse_commandline(argv):
         '-p', '--player', default=DEFAULT_HERO, choices=game.common.HEROES,
         dest='hero', help='Hero to play with'
     )
-    options = parser.parse_args()
-
-    for level_file in options.LEVEL:
-        if not game.assets.search(level_file):
-            logging.error(f'Level "{level_file}" not found!')
-            return None
-
+    options = parser.parse_args(argv)
     return options    
 
 class Client (Ice.Application):
@@ -80,7 +74,7 @@ class Client (Ice.Application):
 
         
 
-        dungeon = RemoteDungeonMap(self.communicator().stringToProxy(user_options.proxy))
+        dungeon = RemoteDungeonMap(self.communicator().stringToProxy(user_options.PROXY))
         game.pyxeltools.initialize()
         gauntlet = game.Game(user_options.hero, dungeon)
         gauntlet.add_state(game.screens.TileScreen, game.common.INITIAL_SCREEN)

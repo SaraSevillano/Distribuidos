@@ -102,6 +102,37 @@ class RoomGestionI():
         '''EL room no existe'''
         raise IceGauntlet.RoomNotExists()
         return 1
+
+    def getRoom (self, roomName, current=None):
+        if len(os.lista("./mapas"))== 1:
+            raise IceGauntlet.RoomNotExists()
+        ruta="mapas/"+random.choice(os.lista("./mapas"))
+        file=open(ruta, "r")
+        room=file.read()
+        file.close()
+        return room
+
+class Server(Ice.Application):
+
+	def run(self, argv):
+			
+		broker = self.communicator()
+		adapter = broker.createObjectAdapter("MapAdapter1")
+		RoomManagerServant = RoomManagerIntarface(self.communicator().stringToProxy(argv[1]))
+		DungeonServant = DungeonInterface()
+		proxy = adapter.add(RoomManagerServant, broker.stringToIdentity("servidorGestionMapas"))
+		proxy1 = adapter.add(DungeonServant, broker.stringToIdentity("servidorMapas"))
+		
+		print(proxy, flush=True)
+		file = open("dungeon_proxy.txt","w")
+		file.write(str(proxy1))
+		file.close()
+		adapter.activate()
+		self.shutdownOnInterrupt()
+		broker.waitForShutdown()
+
+		return 0
+    
         
 if __name__ == '__main__':
     app = RoomGestionI()
