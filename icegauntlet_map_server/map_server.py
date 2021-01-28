@@ -123,15 +123,15 @@ class InitRoomManagers():
             return 
         print("Holaaa! soy %s" % managerId)
         self.roomManagers_dict[managerId] = roomManager
-        self.announce(IceGauntlet.RoomManagerSyncPrx.checkedCast(self.proxy_room_manager), self.id)
+        self.publisher.announce(IceGauntlet.RoomManagerSyncPrx.checkedCast(self.proxy_room_manager), self.id)
    
     def announce(self, roomManager, managerId):
         ''' Announce room manager '''
-        if managerId not in self.roomManagers_dict:
+        if managerId in self.roomManagers_dict:
             return 
         print("Respuesta! yo soy %s" % managerId)
         self.roomManagers_dict[managerId] = roomManager
-        self.publisher.hello(IceGauntlet.RoomManagerSyncPrx.checkedCast(self.proxy_room_manager), self.id)
+
     
 
     def añadir_room(self, roomName, managerId, current=None):
