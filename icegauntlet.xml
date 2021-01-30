@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This file was written by IceGrid GUI -->
+<icegrid>
+   <application name="icegauntlet">
+      <distrib icepatch="${application}.IcePatch2/server"/>
+      <service-template id="IceStorm">
+         <parameter name="instance-name" default="${application}.IceStorm"/>
+         <parameter name="topic-manager-endpoints" default="default"/>
+         <parameter name="publish-endpoints" default="default"/>
+         <parameter name="flush-timeout" default="1000"/>
+         <service name="${instance-name}" entry="IceStormService,37:createIceStorm">
+            <properties>
+               <property name="${service}.LMDB.Path" value="${service.data}"/>
+               <property name="${service}.InstanceName" value="${instance-name}"/>
+               <property name="${service}.Flush.Timeout" value="${flush-timeout}"/>
+            </properties>
+            <adapter name="${service}.Publish" endpoints="${publish-endpoints}" id="${instance-name}.Publish"/>
+            <adapter name="${service}.TopicManager" endpoints="${topic-manager-endpoints}" id="${instance-name}.TopicManager">
+               <object identity="${instance-name}/TopicManager" type="::IceStorm::TopicManager"/>
+            </adapter>
+         </service>
+      </service-template>
+      <server-template id="IcePatch2">
+         <parameter name="instance-name" default="${application}.IcePatch2"/>
+         <parameter name="endpoints" default="default"/>
+         <parameter name="directory" default="/tmp/icegauntlet"/>
+         <server id="${instance-name}" activation="on-demand" application-distrib="false" exe="icepatch2server">
+            <properties>
+               <property name="IcePatch2.InstanceName" value="${instance-name}"/>
+               <property name="IcePatch2.Directory" value="${directory}"/>
+            </properties>
+            <adapter name="IcePatch2" endpoints="${endpoints}" id="${server}.IcePatch2">
+               <object identity="${instance-name}/server" type="::IcePatch2::FileServer"/>
+            </adapter>
+         </server>
+      </server-template>
+      <server-template id="IceStorm">
+         <parameter name="instance-name" default="${application}.IceStorm"/>
+         <parameter name="topic-manager-endpoints" default="default"/>
+         <parameter name="publish-endpoints" default="default"/>
+         <parameter name="flush-timeout" default="1000"/>
+         <icebox id="${instance-name}" activation="on-demand" exe="icebox">
+            <service-instance template="IceStorm" instance-name="${instance-name}" topic-manager-endpoints="${topic-manager-endpoints}" publish-endpoints="${publish-endpoints}" flush-timeout="${flush-timeout}"/>
+         </icebox>
+      </server-template>
+      <server-template id="roomManager">
+         <parameter name="id"/>
+         <parameter name="instance-name" default="roomManager"/>
+         <server id="${instance-name}${id}" activation="manual" exe="./map_server.py" pwd="${application.distrib}">
+            <properties>
+               <property name="Ice.ProgramName" value="roomManager1.roomManager1"/>
+               <property name="Ice.StdErr" value="/tmp/db/node1/roomManager1.err"/>
+               <property name="Ice.StdOut" value="/tmp/db/node1/roomManager1.out"/>
+               <property name="IcePatch2.Directory" value="/tmp/icegauntlet"/>
+               <property name="roomManagerIdentity" value="roomManager"/>
+               <property name="Identity" value="roomManager"/>
+            </properties>
+            <adapter name="RoomManagerAdapter" endpoints="tcp" id="${server}.RoomManagerAdapter" replica-group="roomManagerReplicaGroup"/>
+         </server>
+      </server-template>
+      <replica-group id="roomManagerReplicaGroup">
+         <load-balancing type="ordered" n-replicas="1"/>
+      </replica-group>
+      <node name="node1">
+         <server-instance template="IcePatch2" directory="/tmp/icegauntlet"/>
+         <server-instance template="IceStorm"/>
+         <server-instance template="roomManager" id="1" instance-name="roomManager">
+            <properties>
+               <property name="roomManagerIdentity" value="roomManager"/>
+            </properties>
+         </server-instance>
+         <server id="serverAuthentication" activation="manual" exe="./auth_server.py" pwd="${application.distrib}">
+            <properties>
+               <property name="serverAuthenticationIdentity" value="serverAuthentication"/>
+               <property name="Ice.StdOut" value="/tmp/db/node1/serverAuthentication.out"/>
+               <property name="Ice.StdErr" value="/tmp/db/node1/serverAuthentication.err"/>
+            </properties>
+            <adapter name="AuthenticationAdapter" endpoints="tcp" id="${server}.AuthenticationAdapter">
+               <object identity="serverAuthentication" property="serverAuthenticationIdentity"/>
+            </adapter>
+         </server>
+      </node>
+      <node name="node2">
+         <server-instance template="roomManager" id="2" instance-name="roomManager">
+            <properties>
+               <property name="roomManagerIdentity" value="roomManager"/>
+            </properties>
+         </server-instance>
+         <server-instance template="roomManager" id="3" instance-name="roomManager">
+            <properties>
+               <property name="roomManagerIdentity" value="roomManager"/>
+            </properties>
+         </server-instance>
+      </node>
+   </application>
+</icegrid>
