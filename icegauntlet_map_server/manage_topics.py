@@ -11,12 +11,10 @@ class ManageTopics:
         self.broker = broker
         self.topic_mgr = self.create_topic_manager()
         self.topic_room_manager = self.create_topic_event(self.topic_mgr, topic_room_manager)
-              
     def create_topic_manager(self):
         ''' Create topic manager '''
         key = 'IceStorm.TopicManager.Proxy'
         proxy = self.broker.propertyToProxy(key)
-        
         if proxy is None:
             return None
         return IceStorm.TopicManagerPrx.checkedCast(proxy) # pylint: disable=E1101
