@@ -56,7 +56,7 @@ if found == 0:
 else:
     print('ERROR: token no encontrada')
     sys.exit(1)
-
+    
 proc.expect([pexpect.EOF])
 # Show command output and exit
 print(proc.before.decode().strip())
